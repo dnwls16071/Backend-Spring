@@ -8,6 +8,8 @@ import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class MemberApiController {
 
@@ -40,6 +42,10 @@ public class MemberApiController {
 		return new UpdateMemberResponse(member.getId(), member.getName());
 	}
 
+	@GetMapping("/api/v1/members")
+	public List<Member> membersV1() {
+		return memberService.findMembers();
+	}
 
 	@Data
 	static class CreateMemberResponse {
