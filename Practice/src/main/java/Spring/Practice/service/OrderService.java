@@ -9,9 +9,12 @@ import Spring.Practice.domain.item.Item;
 import Spring.Practice.repository.ItemRepository;
 import Spring.Practice.repository.MemberRepository;
 import Spring.Practice.repository.OrderRepository;
+import Spring.Practice.util.OrderSearch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -52,5 +55,10 @@ public class OrderService {
 	public void cancelOrder(Long orderId) {
 		Order order = orderRepository.findOne(orderId);
 		order.cancelOrder();
+	}
+
+	// 검색 기능
+	public List<Order> findOrders(OrderSearch orderSearch) {
+		return orderRepository.findAllByString(orderSearch);
 	}
 }
