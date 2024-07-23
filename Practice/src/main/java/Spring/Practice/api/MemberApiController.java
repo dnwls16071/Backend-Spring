@@ -3,6 +3,7 @@ package Spring.Practice.api;
 import Spring.Practice.domain.Member;
 import Spring.Practice.service.MemberService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,15 @@ public class MemberApiController {
 		return new CreateMemberResponse(id);
 	}
 
+	@PostMapping("/api/v2/members")
+	public CreateMemberResponse saveMemberV2(@RequestBody @Valid CreateMemberRequest request) {
+		Member member = new Member();
+		member.setId(request.getId());
+		member.setName(request.getName());
+		Long id = memberService.join(member);
+		return new CreateMemberResponse(id);
+	}
+
 	@Data
 	static class CreateMemberResponse {
 		private Long id;
@@ -31,5 +41,13 @@ public class MemberApiController {
 		public CreateMemberResponse(Long id) {
 			this.id = id;
 		}
+	}
+
+	@Data
+	static class CreateMemberRequest {
+		private Long id;
+
+		@NotEmpty
+		private String name;
 	}
 }
