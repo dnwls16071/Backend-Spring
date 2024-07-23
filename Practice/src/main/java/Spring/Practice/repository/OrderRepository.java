@@ -2,6 +2,7 @@ package Spring.Practice.repository;
 
 import Spring.Practice.domain.Order;
 import Spring.Practice.util.OrderSearch;
+import Spring.Practice.util.SimpleOrderQueryDTO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -65,5 +66,17 @@ public class OrderRepository {
 			result = result.setParameter("name", orderSearch.getMemberName().trim());
 		}
 		return result.getResultList();
+	}
+
+	// 페치 조인 최적화
+	public List<Order> findAllWithMemberDelivery() {
+		return em.createQuery("select o from Order o join fetch o.member m join fetch o.delivery d", Order.class)
+				.getResultList();
+	}
+
+	// JPA에서 DTO로 바로 조회할 수 있도록 하기 위해 만든 DTO
+	public List<SimpleOrderQueryDTO> findOrderDtos() {
+		return em.createQuery("select new Spring.Practice.util.SimpleOrderQueryDTO(o.id, m.name, o.orderDate, o.status, d.address) from Order o join o.member m join o.delivery d", SimpleOrderQueryDTO.class)
+				.getResultList();
 	}
 }

@@ -39,4 +39,11 @@ public class MemberService {
 	public Member findOne(Long memberId) {
 		return memberRepository.findOne(memberId);
 	}
+
+	// 수정 → 가급적이면 변경 감지(Dirty Checking)
+	@Transactional
+	public void update(Long id, String name) {
+		Member member = memberRepository.findOne(id);
+		member.setName(name);
+	}
 }
