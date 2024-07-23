@@ -29,19 +29,22 @@ public class OrderRepository {
 		String query = "select o from Order o join o.member m";
 		boolean isFirstCondition = true;
 
-		// 주문 상태로 검색하는 경우
+		// 주문 상태로 검색하는 경우(ORDER, CANCEL 중 하나라도 선택한 경우)
 		if (orderSearch.getOrderStatus() != null) {
 			if (isFirstCondition) {
 				query += " where";
 				isFirstCondition = false;
 			} else {
-				query += "and";
+				query += " and";
 			}
-			query += " o.status = :status";
+			query += " o.status = :status";	// 주문상태로 검색을 하게 된다.
 		}
 
 		// 회원 이름으로 검색하는 경우
-		if (orderSearch.getMemberName() != null) {
+		// public static boolean hasText(@Nullable String str) {
+		//     return str != null && !str.isBlank();
+		// }
+		if (StringUtils.hasText(orderSearch.getMemberName())) {
 			if (isFirstCondition) {
 				query += " where";
 				isFirstCondition = false;
@@ -51,6 +54,7 @@ public class OrderRepository {
 			query += " m.name like :name";
 		}
 
+		// 위의 두 분기문 → 이름도 설정 안하면서 주문상태 역시 설정 안 한 경우 → "select o from Order o join o.member m"(기본 쿼리문이 실행되어 조회가 되는 것)
 		TypedQuery<Order> result = em.createQuery(query, Order.class).setMaxResults(1000);
 
 		if (orderSearch.getOrderStatus() != null) {
@@ -58,7 +62,7 @@ public class OrderRepository {
 		}
 
 		if (StringUtils.hasText(orderSearch.getMemberName())) {
-			result = result.setParameter("name", orderSearch.getMemberName());
+			result = result.setParameter("name", orderSearch.getMemberName().trim());
 		}
 		return result.getResultList();
 	}
