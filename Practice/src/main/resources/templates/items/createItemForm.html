@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/header :: header}" />
+<body>
+<div class="container">
+    <div th:replace="~{fragments/bodyHeader :: bodyHeader}"/>
+    <form th:action="@{/items/new}" th:object="${form}" method="post">
+        <div class="form-group">
+            <label for="name">상품명</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="이름을 입력하세요"/>
+            <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+        <div class="form-group">
+            <label for="price">가격</label>
+            <input type="number" id="price" th:field="*{price}" class="form-control" placeholder="가격을 입력하세요"/>
+            <div th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+        </div>
+        <div class="form-group">
+            <label for="stockQuantity">수량</label>
+            <input type="number" id="stockQuantity" th:field="*{stockQuantity}" class="form-control" placeholder="수량을 입력하세요"/>
+            <div th:if="${#fields.hasErrors('stockQuantity')}" th:errors="*{stockQuantity}"></div>
+        </div>
+        <div class="form-group">
+            <label for="author">저자</label>
+            <input type="text" id="author" th:field="*{author}" class="form-control" placeholder="저자를 입력하세요"/>
+            <div th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></div>
+        </div>
+        <div class="form-group">
+            <label for="isbn">ISBN</label>
+            <input type="text" id="isbn" th:field="*{isbn}" class="form-control" placeholder="ISBN을 입력하세요"/>
+            <div th:if="${#fields.hasErrors('isbn')}" th:errors="*{isbn}"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <br/>
+    <div th:replace="~{fragments/footer :: footer}" />
+</div> <!-- /container -->
+</body>
+</html>
