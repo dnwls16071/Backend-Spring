@@ -4,8 +4,8 @@ import Spring.Practice.domain.Address;
 import Spring.Practice.domain.Order;
 import Spring.Practice.domain.enumType.OrderStatus;
 import Spring.Practice.repository.OrderRepository;
-import Spring.Practice.service.OrderService;
 import Spring.Practice.util.OrderSearch;
+import Spring.Practice.util.SimpleOrderQueryDTO;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +41,11 @@ public class OrderApiController {
 		return all.stream()
 				.map(order -> new SimpleOrderDTO(order))
 				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/api/v4/simple-orders")
+	public List<SimpleOrderQueryDTO> ordersV4() {
+		return orderRepository.findOrderDtos();
 	}
 
 	@Data
