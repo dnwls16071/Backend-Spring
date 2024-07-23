@@ -33,6 +33,16 @@ public class OrderApiController {
 		return new Result(collect);
 	}
 
+	// 기본적으로는 LAZY Loading(지연 로딩)
+	// 필요한 것들만 객체 그래프로 탐색하여 한 번에 가져오도록 하는 것(페치 조인)
+	@GetMapping("/api/v3/simple-orders")
+	public List<SimpleOrderDTO> ordersV3() {
+		List<Order> all = orderRepository.findAllWithMemberDelivery();
+		return all.stream()
+				.map(order -> new SimpleOrderDTO(order))
+				.collect(Collectors.toList());
+	}
+
 	@Data
 	static class SimpleOrderDTO {
 		private Long orderId;
