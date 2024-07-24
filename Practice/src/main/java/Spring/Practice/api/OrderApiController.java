@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
@@ -48,6 +49,17 @@ public class OrderApiController {
 	@GetMapping("/api/v3/orders")
 	public List<OrderDto> ordersV3() {
 		List<Order> all = orderRepository.findAllWithItem();
+		return all.stream()
+				.map(order -> new OrderDto(order))
+				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/api/v3.1/orders")
+	public List<OrderDto> ordersV3page(
+			@RequestParam(name = "offset", defaultValue = "0") int offset,
+			@RequestParam(name = "limit", defaultValue = "100") int limit
+	) {
+		List<Order> all = orderRepository.findAllWithMemberDelivery(offset, limit);
 		return all.stream()
 				.map(order -> new OrderDto(order))
 				.collect(Collectors.toList());
