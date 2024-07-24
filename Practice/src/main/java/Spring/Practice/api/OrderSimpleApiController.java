@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-public class OrderApiController {
+public class OrderSimpleApiController {
 
 	private final OrderRepository orderRepository;
 	@Autowired
-	public OrderApiController(OrderRepository orderRepository) {
+	public OrderSimpleApiController(OrderRepository orderRepository) {
 		this.orderRepository = orderRepository;
 	}
 
