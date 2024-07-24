@@ -12,15 +12,24 @@ spring:
       enabled: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
       #ddl-auto: create
     properties:
       hibernate:
         format_sql: true
+        show_sql: true
+        # [2]. default_batch_fetch_size
+        # ToOne 관계는 페치 조인을 하더라도 페이징에 영향을 주지 않는다.
+        # 따라서 ToOne 관계는 페치 조인으로 쿼리 수를 줄이고 나머지는 default_batch_fetch_size로 최적화
+        # 적당한 사이즈를 골라야 하는데 100 ~ 1000 사이를 선택하는 것을 권장한다.
+        # IN절을 사용하는데 DB에 따라 IN절 파라미터를 1000으로 제한하기도 한다.
+        # 1000으로 잡으면 한 번에 1000개를 DB에서 애플리케이션에 불러오기에 순간 부하가 증가할 수 있으나 100이든 1000이든 전체 데이터를 로딩해야 하므로 메모리 사용량이 같다.
+        # 1000으로 설정하는 것이 가장 좋으나 DB든 애플리케이션이든 순간 부하를 어느 정도까지 견딜 수 있느냐로 결정하면 된다.
+        default_batch_fetch_size: 100
 
 logging:
   level:
     org:
       hibernate:
         sql: debug
-        type: trace
+        #type: trace
