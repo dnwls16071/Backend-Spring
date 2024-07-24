@@ -5,6 +5,8 @@ import Spring.Practice.domain.Order;
 import Spring.Practice.domain.OrderItem;
 import Spring.Practice.domain.enumType.OrderStatus;
 import Spring.Practice.repository.OrderRepository;
+import Spring.Practice.repository.order.query.OrderQueryDto;
+import Spring.Practice.repository.order.query.OrderQueryRepository;
 import Spring.Practice.service.OrderService;
 import Spring.Practice.util.OrderSearch;
 import lombok.Data;
@@ -22,11 +24,13 @@ import java.util.stream.Collectors;
 public class OrderApiController {
 
 	private final OrderService orderService;
+	private final OrderQueryRepository orderQueryRepository;
 	private final OrderRepository orderRepository;
 
 	@Autowired
-	public OrderApiController(OrderService orderService, OrderRepository orderRepository) {
+	public OrderApiController(OrderService orderService, OrderQueryRepository orderQueryRepository, OrderRepository orderRepository) {
 		this.orderService = orderService;
+		this.orderQueryRepository = orderQueryRepository;
 		this.orderRepository = orderRepository;
 	}
 
@@ -63,6 +67,11 @@ public class OrderApiController {
 		return all.stream()
 				.map(order -> new OrderDto(order))
 				.collect(Collectors.toList());
+	}
+
+	@GetMapping("/api/v4/orders")
+	public List<OrderQueryDto> ordersV4() {
+		return orderQueryRepository.findOrderQueryDtos();
 	}
 
 	@Data
