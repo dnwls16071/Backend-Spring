@@ -40,6 +40,19 @@ public class OrderApiController {
 				.collect(Collectors.toList());
 	}
 
+	// 페치 조인 적용
+	// "select distinct o from Order o join fetch o.member m join fetch o.delivery d join fetch o.orderItems oi join fetch oi.item i"
+	// 페치 조인으로 SQL 1번만 실행됨
+	// distinct를 사용하는 이유는 애플리케이션에서 중복을 걸러준다.
+	// 페이징 불가능
+	@GetMapping("/api/v3/orders")
+	public List<OrderDto> ordersV3() {
+		List<Order> all = orderRepository.findAllWithItem();
+		return all.stream()
+				.map(order -> new OrderDto(order))
+				.collect(Collectors.toList());
+	}
+
 	@Data
 	static class OrderDto {
 		private Long orderId;
