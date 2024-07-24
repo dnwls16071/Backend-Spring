@@ -74,12 +74,25 @@ public class OrderRepository {
 				.getResultList();
 	}
 
+	// 일대다 컬렉션 조회 및 페이징을 적용한 솔루션
+	public List<Order> findAllWithMemberDelivery(int offset, int limit) {
+		// Order - Member : 다대일 관계
+		// Order - Delivery : 일대일 관계
+		// [1]. @XToOne → 다대일/일대일 관계를 모두 페치 조인하기
+		return em.createQuery("select o from Order o join fetch o.member m join fetch o.delivery d", Order.class)
+				.setFirstResult(offset)
+				.setMaxResults(limit)
+				.getResultList();
+	}
+
 	// JPA에서 DTO로 바로 조회할 수 있도록 하기 위해 만든 DTO
 	public List<SimpleOrderQueryDTO> findOrderDtos() {
 		return em.createQuery("select new Spring.Practice.util.SimpleOrderQueryDTO(o.id, m.name, o.orderDate, o.status, d.address) from Order o join o.member m join o.delivery d", SimpleOrderQueryDTO.class)
 				.getResultList();
 	}
 
+	// 다대일/일대일 관계 : 페치 조인 적용
+	// 컬렉션 페치 조인
 	public List<Order> findAllWithItem() {
 		return em.createQuery("select distinct o from Order o join fetch o.member m join fetch o.delivery d join fetch o.orderItems oi join fetch oi.item i", Order.class)
 				.getResultList();
