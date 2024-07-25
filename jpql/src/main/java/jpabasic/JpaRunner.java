@@ -2,9 +2,7 @@ package jpabasic;
 
 import jakarta.persistence.*;
 import jpabasic.domain.Member;
-import jpabasic.domain.Order;
-import jpabasic.dto.AgeDTO;
-import jpabasic.dto.MemberDTO;
+import jpabasic.domain.Team;
 
 import java.util.List;
 
@@ -17,105 +15,102 @@ public class JpaRunner {
 		tx.begin();
 
 		try {
+			Team team1 = new Team();
+			team1.setName("팀A");
+			em.persist(team1);
+
+			Team team2 = new Team();
+			team2.setName("팀B");
+			em.persist(team2);
+
 			Member m1 = new Member();
-			m1.setUsername("m1");
-			m1.setAge(10);
-
 			Member m2 = new Member();
-			m2.setUsername("m2");
-			m2.setAge(15);
-
 			Member m3 = new Member();
-			m3.setUsername("m3");
-			m3.setAge(20);
-			
-			// distinct 테스트 위해 Member 객체 추가
 			Member m4 = new Member();
-			m4.setUsername("m4");
-			m4.setAge(20);
-			
+			Member m5 = new Member();
+
+			m1.setTeam(team1);
+			m2.setTeam(team1);
+			m3.setTeam(team2);
+			m4.setTeam(team2);
+
 			em.persist(m1);
 			em.persist(m2);
 			em.persist(m3);
 			em.persist(m4);
+			em.persist(m5);
 
 			em.flush();
 			em.clear();
 
-			// 반환할 타입을 명확히 지정할 수 있으면? → TypedQuery
-			TypedQuery<Member> query1 = em.createQuery("select m from Member m", Member.class);
-			List<Member> result1 = query1.getResultList();
-			result1.stream().forEach(m -> System.out.println(m.getUsername()));
+			// 엔티티 내부 조인
+			System.out.println("엔티티 내부 조인");
+			List<Member> join1 = em.createQuery("select m from Member m inner join m.team t", Member.class)
+					.getResultList();
+			for (Member member : join1) {
+				System.out.println(member);
+			}
 
 			em.flush();
 			em.clear();
-
-			// 반환할 타입을 명확히 지정할 수 없다면? → Query
-			Query query2 = em.createQuery("select m from Member m");
-			List result2 = query2.getResultList();
-			result2.stream().forEach(o -> System.out.println(((Member) o).getUsername()));
+			
+			// 엔티티 외부 조인
+			System.out.println("엔티티 외부 조인");
+			List<Member> join2 = em.createQuery("select m from Member m left join m.team t", Member.class)
+					.getResultList();
+			for (Member member : join2) {
+				System.out.println(member);
+			}
+			
+			em.flush();
+			em.clear();
+			
+			// 컬렉션 조인
+			// 현재 팀A에 소속된 멤버는 총 4명
+			// 일대다 컬렉션 조인의 경우 다(N)에 해당하는 만큼의 데이터 뻥튀기가 발생하는 문제가 발생
+			System.out.println("일대다 컬렉션 조인");
+			List<Team> join3 = em.createQuery("select t from Team t join t.members", Team.class)
+					.getResultList();
+			for (Team t : join3) {
+				System.out.println(t.getName() + " : " + t.getMembers().size());
+			}
+			
+			em.flush();
+			em.clear();
+			
+			// 컬렉션 조인
+			// 현재 팀A에 소속된 멤버는 총 4명
+			// 위에서 제기된 일대다 컬렉션의 문제점을 해결하기 위해 애플리케이션 차원에서 중복을 제거하는 distinct 키워드를 지원
+			System.out.println("일대다 컬렉션 조인 - distinct 키워드");
+			List<Team> join4 = em.createQuery("select distinct t from Team t join t.members", Team.class)
+					.getResultList();
+			for (Team t : join4) {
+				System.out.println(t.getName() + " : " + t.getMembers().size());
+			}
 
 			em.flush();
 			em.clear();
-
-			// 이름 파라미터 바인딩 적용
-			Member singleResult = em.createQuery("select m from Member m where m.username = :username", Member.class)
-					.setParameter("username", "m2")
-					.getSingleResult();
-			System.out.println(singleResult.getUsername());
-
-			em.flush();
-			em.clear();
-
-			// 엔티티 프로젝션(Ex. Member, Team)
-			// 엔티티 프로젝션의 경우 영속성 컨텍스트에서 관리된다.
-			List<Member> p1 = em.createQuery("select m.team from Member m", Member.class)
+			
+			// 엔티티 페치 조인
+			// 팀과 멤버를 함께 조인하여 한 번에 가져옴
+			System.out.println("엔티티 페치 조인");
+			List<Member> join5 = em.createQuery("select m from Member m join fetch m.team t", Member.class)
 					.getResultList();
-
-			// 임베디드 타입 프로젝션(Ex. Address)
-			// 임베디드 타입 프로젝션의 경우 영속성 컨텍스트에서 관리되지 않는다.
-			List<Order> p2 = em.createQuery("select o.address from Order o", Order.class)
-					.getResultList();
-
-			// 스칼라 타입 프로젝션(Ex. username, age)
-			List<Member> p3 = em.createQuery("select m.username from Member m", Member.class)
-					.getResultList();
-
-			// 여러 프로젝션 → Object[]
-			List<Object[]> p4 = em.createQuery("select m.username, m.age from Member m")
-					.getResultList();
-			for (Object[] objects : p4) {
-				String username = (String) objects[0];
-				Integer age = (Integer) objects[1];
-				System.out.println(username + " : " + age);
+			for (Member member : join5) {
+				System.out.println(member);
 			}
 
-			// 실제 애플리케이션 개발 시 DTO를 만들어 DTO 타입으로 변환
-			List<MemberDTO> p5 = em.createQuery("select new jpabasic.dto.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+			// 컬렉션 페치 조인 + distinct
+			System.out.println("컬렉션 페치 조인");
+			List<Team> join6 = em.createQuery("select distinct t from Team t join fetch t.members", Team.class)
 					.getResultList();
-			for (MemberDTO memberDTO : p5) {
-				String username = memberDTO.getUsername();
-				int age = memberDTO.getAge();
-				System.out.println(username + " : " + age);
+			for (Team t : join6) {
+				System.out.println(t.getName());
+				for (Member member : t.getMembers()) {
+					System.out.println(member);
+				}
 			}
 
-			// 페이징
-			// 예상 결과 : 나이 순 내림차순 정렬 m3 → m2 → m1
-			// 그 중에서 조회 시작 위치는 m2(setFirstResult(1)) 조회할 데이터 수는 2개(setMaxResults(2))
-			List<Member> paging = em.createQuery("select m from Member m order by m.age desc", Member.class)
-					.setFirstResult(1)
-					.setMaxResults(2)
-					.getResultList();
-			for (Member member : paging) {
-				System.out.println(member.getUsername());
-			}
-
-			// 예상 결과 : distinct로 중복을 제거하므로 10, 15, 20, 20 중에서 20이 중복 제거되어 한 번만 나옴
-			List<AgeDTO> list = em.createQuery("select distinct new jpabasic.dto.AgeDTO(m.age) from Member m", AgeDTO.class)
-					.getResultList();
-			for (AgeDTO ageDTO : list) {
-				System.out.println(ageDTO.getAge());
-			}
 			tx.commit();
 		} catch (Exception e) {
 			tx.rollback();
