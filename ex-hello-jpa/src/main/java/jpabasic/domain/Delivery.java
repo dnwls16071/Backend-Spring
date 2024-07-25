@@ -19,4 +19,7 @@ public class Delivery extends BaseEntity {
 	private String street;
 	private String zipcode;
 	private DeliveryStatus status;
+
+	@Embedded
+	private Address address;
 }
