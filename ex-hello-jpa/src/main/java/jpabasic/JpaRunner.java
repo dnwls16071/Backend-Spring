@@ -4,6 +4,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.Persistence;
+import jpabasic.domain.Member;
+import jpabasic.domain.Team;
 
 public class JpaRunner {
 	public static void main(String[] args) {
@@ -14,6 +16,14 @@ public class JpaRunner {
 		tx.begin();
 
 		try {
+			Team team = new Team();
+			team.setName("team");
+			em.persist(team);
+
+			Member member = new Member();
+			member.setName("member");
+			member.setTeam(team);
+			em.persist(member);
 
 			tx.commit();
 		} catch (Exception e) {
