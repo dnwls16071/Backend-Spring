@@ -1,6 +1,7 @@
 package jpabasic.domain;
 
 import jakarta.persistence.*;
+import jpabasic.domain.baseentity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "ORDER_ITEM")	// ORDER - ITEM의 관계는 다대다 관계
-public class OrderItem {
+public class OrderItem extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "orderitem_id")

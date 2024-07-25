@@ -1,6 +1,7 @@
 package jpabasic.domain;
 
 import jakarta.persistence.*;
+import jpabasic.domain.baseentity.BaseEntity;
 import jpabasic.domain.enumType.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "ORDERS")
-public class Order {
+public class Order extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "order_id")

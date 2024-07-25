@@ -1,6 +1,7 @@
 package jpabasic.domain;
 
 import jakarta.persistence.*;
+import jpabasic.domain.baseentity.BaseEntity;
 import jpabasic.domain.enumType.DeliveryStatus;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "DELIVERY")
-public class Delivery {
+public class Delivery extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "delivery_id")

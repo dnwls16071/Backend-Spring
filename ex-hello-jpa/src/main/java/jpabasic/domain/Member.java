@@ -1,6 +1,7 @@
 package jpabasic.domain;
 
 import jakarta.persistence.*;
+import jpabasic.domain.baseentity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "MEMBERS")
-public class Member {
+public class Member extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
