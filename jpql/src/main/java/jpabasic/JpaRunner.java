@@ -49,14 +49,10 @@ public class JpaRunner {
 			}
 
 			// 컬렉션 필드 연관 경로 표현 - 명시적 조인
-			List<Team> list1 = em.createQuery("select t from Team t join t.members", Team.class)
+			List<Member> list1 = em.createQuery("select m from Team t join t.members m", Member.class)
 					.getResultList();
-			for (Team t : list1) {
-				System.out.println("팀 이름 : " + t.getName());
-				List<Member> members = t.getMembers();
-				for (Member member : members) {
-					System.out.println("이름 : " + member.getUsername() + ", 나이 : " + member.getAge());
-				}
+			for (Member member : list1) {
+				System.out.println(member);
 			}
 
 			tx.commit();
