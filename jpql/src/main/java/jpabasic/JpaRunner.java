@@ -38,19 +38,31 @@ public class JpaRunner {
 			m3.setTeam(team);
 			em.persist(m3);
 
-			// 단일 값 경로 탐색 (1)
-			List<Integer> list = em.createQuery("select m.age from Member m", Integer.class)
+			em.flush();
+			em.clear();
+
+			// 상태 필드 연관 경로 탐색 - 명시적 조인(외부 조인)
+			// 검색하고자 하는 것 : Member
+			// 기준 : Member
+			// 조인 대상 : Team
+			List<Member> list = em.createQuery("select m from Member m join m.team t", Member.class)
 					.getResultList();
-			for (Integer integer : list) {
-				System.out.println(integer);
+			for (Member member : list) {
+				String name = member.getUsername();
+				Integer age = member.getAge();
+				System.out.println(name + " : " + age);
 			}
 
-			// 단일 값 경로 탐색 (2)
-			List<String> list1 = em.createQuery("select m.username from Member m", String.class)
+			// 상태 필드 연관 경로 탐색 - 묵시적 조인(내부 조인)
+			// 검색하고자 하는 것 : Team
+			// 기준 : Member
+			// 조인 대상 : Team
+			List<Team> list1 = em.createQuery("select m.team from Member m", Team.class)
 					.getResultList();
-			for (String string : list1) {
-				System.out.println(string);
+			for (Team t : list1) {
+				System.out.println(t.getName());
 			}
+
 
 			tx.commit();
 		} catch (Exception e) {
