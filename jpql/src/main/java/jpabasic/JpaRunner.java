@@ -41,28 +41,23 @@ public class JpaRunner {
 			em.flush();
 			em.clear();
 
-			// 상태 필드 연관 경로 탐색 - 명시적 조인(외부 조인)
-			// 검색하고자 하는 것 : Member
-			// 기준 : Member
-			// 조인 대상 : Team
-			List<Member> list = em.createQuery("select m from Member m join m.team t", Member.class)
+			// 컬렉션 필드 연관 경로 표현 - 묵시적 조인
+			List<Member> list = em.createQuery("select t.members from Team t", Member.class)
 					.getResultList();
 			for (Member member : list) {
-				String name = member.getUsername();
-				Integer age = member.getAge();
-				System.out.println(name + " : " + age);
+				System.out.println(member);
 			}
 
-			// 상태 필드 연관 경로 탐색 - 묵시적 조인(내부 조인)
-			// 검색하고자 하는 것 : Team
-			// 기준 : Member
-			// 조인 대상 : Team
-			List<Team> list1 = em.createQuery("select m.team from Member m", Team.class)
+			// 컬렉션 필드 연관 경로 표현 - 명시적 조인
+			List<Team> list1 = em.createQuery("select t from Team t join t.members", Team.class)
 					.getResultList();
 			for (Team t : list1) {
-				System.out.println(t.getName());
+				System.out.println("팀 이름 : " + t.getName());
+				List<Member> members = t.getMembers();
+				for (Member member : members) {
+					System.out.println("이름 : " + member.getUsername() + ", 나이 : " + member.getAge());
+				}
 			}
-
 
 			tx.commit();
 		} catch (Exception e) {
