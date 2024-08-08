@@ -3,6 +3,7 @@ package study.springdatajpa.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +34,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Modifying(clearAutomatically = true)	// 수정 시 필수
 	@Query(value = "update Member m set m.age = m.age + 1 where m.age >= :age")
 	int bulkAgePlus(@Param(value = "age") int age);
+
+	// 페치조인 쿼리 작성 → 기본적으로 left outer join
+	// join → team_id가 null인 member들이 안 나옴
+	// left join → team_id가 null인 member들도 같이 나옴
+	// left join(외부 조인의 개념) != join(내부 조인의 개념)
+	@Query(value = "select m from Member m left join fetch m.team t")	// JPQL로 직접 페치 조인을 작성하여 해결하는 방법
+	List<Member> findMemberFetchJoin();
+
+	// 메서드 재정의해서 FETCH JOIN 적용
+	@Override
+	@EntityGraph(attributePaths = {"team"})
+	List<Member> findAll();
 }

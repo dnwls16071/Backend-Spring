@@ -128,4 +128,18 @@ class MemberRepositoryTest {
 			System.out.println(member.getUsername() + " : " + member.getAge());
 		}
 	}
+
+	@Test
+	void fetchJoin() {
+		Team team = new Team("teamA");
+		teamRepository.save(team);
+
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 12));
+		memberRepository.save(new Member("member3", 14));
+		memberRepository.save(new Member("member4", 16));
+		memberRepository.save(new Member("member5", 18));
+
+		List<Member> members = memberRepository.findMemberFetchJoin();
+	}
 }
