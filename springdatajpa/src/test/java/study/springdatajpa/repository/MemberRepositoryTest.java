@@ -130,6 +130,7 @@ class MemberRepositoryTest {
 	}
 
 	@Test
+	@Transactional
 	void fetchJoin() {
 		Team team = new Team("teamA");
 		teamRepository.save(team);
@@ -141,5 +142,40 @@ class MemberRepositoryTest {
 		memberRepository.save(new Member("member5", 18));
 
 		List<Member> members = memberRepository.findMemberFetchJoin();
+	}
+
+	@Test
+	@Transactional
+	void queryHint() {
+		/*
+		Member member = new Member("member1", 10);
+		memberRepository.save(member);
+		em.flush();
+		em.clear();
+
+		Member findMember = memberRepository.findById(member.getId()).get();
+		findMember.setUsername("member2");	// 여기서 UPDATE 쿼리문 날아가는거 아님(개념 잘 이해)
+		em.flush();							// JPA 영속성 컨텍스트 내부의 내용을 DB로 강제 반영해야 UPDATE 쿼리문이 나가게 됨(예상 결과)	
+		 */
+
+		Member member = new Member("member1", 10);
+		memberRepository.save(member);
+		em.flush();
+		em.clear();
+
+		Member findMember = memberRepository.findReadOnlyByUsername("member1");
+		findMember.setUsername("member2");
+		em.flush();							// READ_ONLY 속성이기에 변경 감지가 일어나지 않음
+	}
+
+	@Test
+	@Transactional
+	void lock() {
+		Member member = new Member("member1", 10);
+		memberRepository.save(member);
+		em.flush();
+		em.clear();
+
+		List<Member> members = memberRepository.findLockByUsername("member1");
 	}
 }
