@@ -46,4 +46,16 @@ class MemberRepositoryTest {
 		List<MemberDto> dtoList = memberRepository.findUserDto();
 		Assertions.assertThat(dtoList.size()).isEqualTo(2);
 	}
+
+	@Test
+	@Transactional
+	void findUsernameList() {
+		Member m1 = new Member("AAA", 10);
+		Member m2 = new Member("BBB", 20);
+		memberRepository.save(m1);
+		memberRepository.save(m2);
+
+		List<Member> usernameList = memberRepository.findByNames(List.of("AAA", "BBB"));
+		Assertions.assertThat(usernameList.size()).isEqualTo(2);
+	}
 }
