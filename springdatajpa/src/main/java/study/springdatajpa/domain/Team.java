@@ -1,8 +1,7 @@
 package study.springdatajpa.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Team {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +19,10 @@ public class Team {
 
 	@OneToMany(mappedBy = "team")
 	private List<Member> members = new ArrayList<>();
+
+	public Team(String name) {
+		this.name = name;
+	}
 
 	public void addMember(Member member) {
 		this.getMembers().add(member);
