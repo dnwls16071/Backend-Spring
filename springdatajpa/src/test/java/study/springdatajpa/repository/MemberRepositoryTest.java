@@ -1,5 +1,7 @@
 package study.springdatajpa.repository;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,7 @@ class MemberRepositoryTest {
 
 	@Autowired private MemberRepository memberRepository;
 	@Autowired private TeamRepository teamRepository;
+	@PersistenceContext	private EntityManager em;
 
 	@Test
 	@Transactional
@@ -97,5 +100,32 @@ class MemberRepositoryTest {
 		Assertions.assertThat(page.getTotalPages()).isEqualTo(2);	 // (Page OK, Slice NO)
 		Assertions.assertThat(page.isFirst()).isTrue();
 		Assertions.assertThat(page.hasNext()).isTrue();
+	}
+
+	@Test
+	@Transactional
+	void bulkUpdate() {
+		memberRepository.save(new Member("member1", 10));
+		memberRepository.save(new Member("member2", 12));
+		memberRepository.save(new Member("member3", 14));
+		memberRepository.save(new Member("member4", 16));
+		memberRepository.save(new Member("member5", 18));
+
+		List<Member> beforeBulk = em.createQuery("select m from Member m", Member.class).getResultList();
+		for (Member member : beforeBulk) {
+			System.out.println(member.getUsername() + " : " + member.getAge());
+		}
+
+		// 벌크성 수정 쿼리문 실행(UPDATE문, JPA의 영속성 컨텍스트에는 반영되지 않고 바로 DB에 반영됨)
+		// 데이터 일관성 문제가 발생할 우려가 있으므로 벌크성 수정 쿼리문을 실행했다면 JPA 영속성 컨텍스트를 초기화하는 것이 좋다.
+		// @Modifying(clearAutomatically = true) 옵션 사용 권장
+		int resultCount = memberRepository.bulkAgePlus(17);
+		em.flush();
+		em.clear();
+
+		List<Member> afterBulk = em.createQuery("select m from Member m", Member.class).getResultList();
+		for (Member member : afterBulk) {
+			System.out.println(member.getUsername() + " : " + member.getAge());
+		}
 	}
 }
