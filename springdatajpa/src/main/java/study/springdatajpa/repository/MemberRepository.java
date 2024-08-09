@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.springdatajpa.domain.Member;
 import study.springdatajpa.dto.MemberDto;
+import study.springdatajpa.repository.custom.MemberRepositoryCustom;
 
 import java.util.List;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
 	@Query("select m from Member m where m.username = :username and m.age = :age")
 	List<Member> findUser(@Param(value = "username") String username, @Param(value = "age") int age);
