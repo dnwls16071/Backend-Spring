@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 // 스프링 부트에서 제공하는 tomcat의 오류 페이지 대신 사용할 오류 페이지 커스터마이징
-@Component
+//@Component
 public class WebServerCustomizer implements WebServerFactoryCustomizer<ConfigurableWebServerFactory> {
 	@Override
 	public void customize(ConfigurableWebServerFactory factory) {
